@@ -22,6 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="dev.sugarscope.textsecureclient.SignUpActivity"
+            android:label="@string/title_activity_sign_up" >
+        </activity>
+        <activity
+            android:name="dev.sugarscope.textsecureclient.InboxActivity"
+            android:label="@string/title_activity_inbox" >
+        </activity>
     </application>
 
 </manifest>
