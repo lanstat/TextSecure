@@ -3,10 +3,8 @@ package dev.sugarscope.client;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Observable;
 
 import android.os.Handler;
-import android.os.Looper;
 import dev.sugarscope.generic.Utils;
 import dev.sugarscope.transport.Packet;
 

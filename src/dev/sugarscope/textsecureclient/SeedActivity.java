@@ -1,13 +1,15 @@
 package dev.sugarscope.textsecureclient;
 
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -16,9 +18,11 @@ import dev.sugarscope.textsecureclient.settings.Settings;
 import dev.sugarscope.textsecureclient.settings.Tag;
 import dev.sugarscope.transport.Packet;
 
+@SuppressLint("HandlerLeak")
 @TargetApi(Build.VERSION_CODES.GINGERBREAD)
 public class SeedActivity extends BaseActivity{
 	private EditText edtSeed;
+	private String mSeed;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +32,27 @@ public class SeedActivity extends BaseActivity{
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 		mHandler = new Handler(){
-
 			@Override
 			public void handleMessage(Message msg) {
 				final Packet packet = (Packet)msg.obj;
-				Toast.makeText(getBaseContext(), packet.toString(), Toast.LENGTH_SHORT).show();
+				switch (packet.getTag()) {
+				case Tag.VERIFY_SEED:
+					if(Boolean.valueOf(packet.getData()[0].toString())){
+						Intent intent = new Intent(getBaseContext(), SignUpActivity.class);
+						intent.putExtra("seed", mSeed);
+						startActivity(intent);
+						finish();
+					}else{
+						showMessage("Codigo de activacion invalido");
+					}
+					break;
+				}
 			}
 			
 		};
 	}
+	
+	
 	
 	@Override
 	protected void onResume() {
@@ -50,9 +66,9 @@ public class SeedActivity extends BaseActivity{
 	}
 
 	public void clickMe(View v){
-		final String seed = edtSeed.getText().toString();
+		mSeed = edtSeed.getText().toString();
 		Packet packet = new Packet(Tag.VERIFY_SEED);
-		packet.setData(seed);
+		packet.setData(mSeed);
 		Client.getInstance().sendPackage(packet);
 	}
 
