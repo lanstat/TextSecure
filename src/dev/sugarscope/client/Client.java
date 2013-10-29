@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import android.util.Log;
 import dev.sugarscope.transport.Packet;
 
 public class Client implements Observer{
@@ -35,9 +36,13 @@ public class Client implements Observer{
 	 * @throws IOException Lanzado cuando existe un error la comunicacion.
 	 */
 	public void connect(String serverHost, int port) throws UnknownHostException, IOException{
-		mclsSocket = new Socket(serverHost, port);
-		mclsReader = new Reader(mclsSocket.getInputStream());
-		new Thread(mclsReader).start();
+		if(mclsSocket==null){
+			mclsSocket = new Socket(serverHost, port);
+			mclsReader = new Reader(mclsSocket.getInputStream());
+			new Thread(mclsReader).start();
+		}else{
+			Log.e("TextSecure", "El socket ya esta creado");
+		}
 	}
 	
 	/**

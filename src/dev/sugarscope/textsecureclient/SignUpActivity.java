@@ -1,5 +1,6 @@
 package dev.sugarscope.textsecureclient;
 
+import persistance.DatabaseHandler;
 import dev.sugarscope.client.Client;
 import dev.sugarscope.textsecureclient.settings.Tag;
 import dev.sugarscope.transport.Packet;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
@@ -15,6 +17,7 @@ import android.widget.EditText;
 public class SignUpActivity extends BaseActivity {
 	private String mSeed;
 	private EditText mPhone;
+	private String mNumber;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +38,20 @@ public class SignUpActivity extends BaseActivity {
 				final Packet packet = (Packet)msg.obj;
 				switch (packet.getTag()) {
 				case Tag.SIGN_UP:
-					showMessage("Registrado");
+					showMessage("Registro exitoso");
+					save();
+					finish();
 					break;
 				}
 			}
 			
 		};
+	}
+	
+	private void save(){
+		DatabaseHandler handler = new DatabaseHandler(this);
+		handler.putSetting("phone", mNumber);
+		handler.close();
 	}
 	
 	private String getImei(){
@@ -55,9 +66,9 @@ public class SignUpActivity extends BaseActivity {
 	}
 
 	public void clickMe(View v){
-		final String phone = mPhone.getText().toString();
+		mNumber = mPhone.getText().toString();
 		Packet packet =new Packet(Tag.SIGN_UP);
-		packet.setData(mSeed, getImei(), phone);
+		packet.setData(mSeed, getImei(), mNumber);
 		Client.getInstance().sendPackage(packet);
 	}
 

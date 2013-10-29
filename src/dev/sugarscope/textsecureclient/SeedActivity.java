@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,8 +17,6 @@ import dev.sugarscope.textsecureclient.settings.Settings;
 import dev.sugarscope.textsecureclient.settings.Tag;
 import dev.sugarscope.transport.Packet;
 
-@SuppressLint("HandlerLeak")
-@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 public class SeedActivity extends BaseActivity{
 	private EditText edtSeed;
 	private String mSeed;
@@ -29,8 +26,6 @@ public class SeedActivity extends BaseActivity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_seed);
 		edtSeed = (EditText) findViewById(R.id.edtSeed);
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-		StrictMode.setThreadPolicy(policy);
 		mHandler = new Handler(){
 			@Override
 			public void handleMessage(Message msg) {
