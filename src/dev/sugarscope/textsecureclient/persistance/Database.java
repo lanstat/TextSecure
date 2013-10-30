@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class Database extends SQLiteOpenHelper {
-	private static final int VERSION = 3;
+	private static final int VERSION = 5;
 	private static final String NAME = "secure";
 
 	public Database(Context context) {

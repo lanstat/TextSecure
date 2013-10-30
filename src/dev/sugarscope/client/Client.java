@@ -11,21 +11,21 @@ import android.util.Log;
 import dev.sugarscope.transport.Packet;
 
 public class Client implements Observer{
-	private Socket mclsSocket;
-	private static Client mclsClient;
-	private Reader mclsReader;
-	private ArrayList<Packet> marrStackPakects;
-	private boolean mblnSendingInProcess;
+	private Socket mSocket;
+	private static Client mClient;
+	private Reader mReader;
+	private ArrayList<Packet> mStackPakects;
+	private boolean mSendingInProcess;
 	
 	private Client(){
-		mblnSendingInProcess = false;
-		marrStackPakects = new ArrayList<Packet>();
+		mSendingInProcess = false;
+		mStackPakects = new ArrayList<Packet>();
 	}
 	
 	public static Client getInstance(){
-		if(mclsClient==null)
-			mclsClient = new Client();
-		return mclsClient;
+		if(mClient==null)
+			mClient = new Client();
+		return mClient;
 	}
 	
 	/**
@@ -36,10 +36,10 @@ public class Client implements Observer{
 	 * @throws IOException Lanzado cuando existe un error la comunicacion.
 	 */
 	public void connect(String serverHost, int port) throws UnknownHostException, IOException{
-		if(mclsSocket==null){
-			mclsSocket = new Socket(serverHost, port);
-			mclsReader = new Reader(mclsSocket.getInputStream());
-			new Thread(mclsReader).start();
+		if(mSocket==null){
+			mSocket = new Socket(serverHost, port);
+			mReader = new Reader(mSocket.getInputStream());
+			new Thread(mReader).start();
 		}else{
 			Log.e("TextSecure", "El socket ya esta creado");
 		}
@@ -50,16 +50,18 @@ public class Client implements Observer{
 	 * @param lclsPacket {@link Packet} Paquete con los datos a enviar. 
 	 */
 	public void sendPackage(Packet lclsPacket){
-		try {
-			if(!mblnSendingInProcess){
-				sendPacketNow(lclsPacket);
-				mblnSendingInProcess = true;
-			}else{
-				marrStackPakects.add(lclsPacket);
+		if(mSocket.isConnected()){
+			try {
+				if(!mSendingInProcess){
+					sendPacketNow(lclsPacket);
+					mSendingInProcess = true;
+				}else{
+					mStackPakects.add(lclsPacket);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				mSendingInProcess = false;
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			mblnSendingInProcess = false;
 		}
 	}
 	
@@ -69,7 +71,7 @@ public class Client implements Observer{
 	 * @throws IOException
 	 */
 	private void sendPacketNow(Packet lclsPacket) throws IOException{
-		final Sender lclsSender = new Sender(lclsPacket, mclsSocket.getOutputStream());
+		final Sender lclsSender = new Sender(lclsPacket, mSocket.getOutputStream());
 		lclsSender.addObserver(this);
 		new Thread(lclsSender).start();
 	}
@@ -79,29 +81,29 @@ public class Client implements Observer{
 	 * @throws IOException 
 	 */
 	public void close() throws IOException{
-		if(mclsSocket != null && mclsSocket.isConnected()){
-			mclsReader.setRunning(false);
-			mclsSocket.close();
+		if(mSocket != null && mSocket.isConnected()){
+			mReader.setRunning(false);
+			mSocket.close();
 		}
-		mclsReader = null;
-		marrStackPakects = null;
-		mclsSocket = null;
-		mclsClient = null;
+		mReader = null;
+		mStackPakects = null;
+		mSocket = null;
+		mClient = null;
 	}
 	
 	public Reader getReader(){
-		return mclsReader;
+		return mReader;
 	}
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		if(marrStackPakects.isEmpty()){
-			mblnSendingInProcess = false;
+		if(mStackPakects.isEmpty()){
+			mSendingInProcess = false;
 			return;
 		}
 		try {
-			sendPacketNow(marrStackPakects.get(0));
-			marrStackPakects.remove(0);
+			sendPacketNow(mStackPakects.get(0));
+			mStackPakects.remove(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -15,7 +15,7 @@ public class ControlMensaje {
 		Packet packet = new Packet(Tag.SEND_MESSAGE);
 		packet.setData(new String[]{phone}, content);
 		Client.getInstance().sendPackage(packet);
-		DatabaseHandler.getInstance().saveMessage(new Message(phone, content));
+		DatabaseHandler.getInstance().saveMessage(new Message("Yo", content, null, phone));
 	}
 	
 	public ArrayList<Message> leer(String phone){
@@ -37,7 +37,7 @@ public class ControlMensaje {
 	}
 	
 	public void eliminar(int id){
-		
+		DatabaseHandler.getInstance().deleteMessage(id);
 	}
 	
 }

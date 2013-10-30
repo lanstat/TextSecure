@@ -7,6 +7,7 @@ import dev.sugarscope.textsecureclient.BaseActivity;
 import dev.sugarscope.textsecureclient.R;
 import dev.sugarscope.textsecureclient.contacts.ContactsActivity;
 import dev.sugarscope.textsecureclient.controllers.ControlMensaje;
+import dev.sugarscope.textsecureclient.messages.adapters.ConversationAdapter;
 import dev.sugarscope.textsecureclient.persistance.DatabaseHandler;
 import dev.sugarscope.textsecureclient.persistance.models.Message;
 import dev.sugarscope.textsecureclient.settings.Settings;
@@ -24,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -33,7 +33,7 @@ public class InboxActivity extends BaseActivity implements OnItemClickListener{
 	ListView mList;
 	ArrayList<Message> mContacts;
 	ControlMensaje mController;
-	ArrayAdapter<Message> mAdapter;
+	ConversationAdapter mAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +62,10 @@ public class InboxActivity extends BaseActivity implements OnItemClickListener{
 	private void addMessage(Object[] data){
 		final String phone= data[0].toString();
 		final String content = data[1].toString();
-		final Message item = new Message(phone, content);
+		final byte[] image = (byte[])data[2];
+		final Message item = new Message(phone, content, image, phone);
 		mController.guardar(item);
-		final DatabaseHandler handler = DatabaseHandler.getInstance();
-		mContacts = handler.getConversations();
+		mContacts = mController.obtenerConversaciones();
 		mAdapter.notifyDataSetChanged();
 		showMessage("Nuevo mensaje recibido");
 	}
@@ -88,9 +88,7 @@ public class InboxActivity extends BaseActivity implements OnItemClickListener{
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mContacts = mController.obtenerConversaciones();
-		mAdapter = new ArrayAdapter<Message>(this, android.R.layout.simple_list_item_1, mContacts);
-		mList.setAdapter(mAdapter);
+		loadConversations();
 		mList.setOnItemClickListener(this);
 		try {
 			Client.getInstance().connect(Settings.SERVER_HOST, Settings.SERVER_PORT);
@@ -100,6 +98,12 @@ public class InboxActivity extends BaseActivity implements OnItemClickListener{
 		} catch (Exception e) {
 			showMessage("No se logro realizar un conexion con el servidor.");
 		}
+	}
+	
+	private void loadConversations(){
+		mContacts = mController.obtenerConversaciones();
+		mAdapter = new ConversationAdapter(this, mContacts);
+		mList.setAdapter(mAdapter);
 	}
 
 	@Override

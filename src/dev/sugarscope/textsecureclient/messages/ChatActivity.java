@@ -2,21 +2,27 @@ package dev.sugarscope.textsecureclient.messages;
 
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ListView;
 import dev.sugarscope.client.Client;
 import dev.sugarscope.textsecureclient.BaseActivity;
 import dev.sugarscope.textsecureclient.R;
 import dev.sugarscope.textsecureclient.controllers.ControlMensaje;
+import dev.sugarscope.textsecureclient.messages.adapters.ChatAdapter;
 import dev.sugarscope.textsecureclient.persistance.models.Message;
+import dev.sugarscope.textsecureclient.settings.Settings;
 import dev.sugarscope.transport.Packet;
 import dev.sugarscope.transport.Tag;
-import android.os.Bundle;
-import android.os.Handler;
-import android.annotation.SuppressLint;
-import android.view.Menu;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
 
 @SuppressLint("HandlerLeak")
 public class ChatActivity extends BaseActivity {
@@ -26,7 +32,7 @@ public class ChatActivity extends BaseActivity {
 	EditText mContent;
 	ControlMensaje mController;
 	String mPhone;
-	ArrayAdapter<Message> mAdapter;
+	ChatAdapter mAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +60,12 @@ public class ChatActivity extends BaseActivity {
 	private void addMessage(Object[] data){
 		final String phone= data[0].toString();
 		final String content = data[1].toString();
-		final Message item = new Message(phone, content);
+		final byte[] image = (byte[])data[2];
+		final Message item = new Message(phone, content, image, phone);
 		mController.guardar(item);
 		mMessages.add(item);
 		mAdapter.notifyDataSetChanged();
+		mList.setSelection(mList.getAdapter().getCount()-1);
 	}
 
 	@Override
@@ -68,7 +76,8 @@ public class ChatActivity extends BaseActivity {
 		if(bundle != null){
 			mPhone = bundle.getString("phone");
 			mMessages = mController.leer(mPhone);
-			mAdapter = new ArrayAdapter<Message>(this, android.R.layout.simple_list_item_1, mMessages);
+			mAdapter = new ChatAdapter(this, mMessages);
+			registerForContextMenu(mList);
 			mList.setAdapter(mAdapter);
 		}
 	}
@@ -78,11 +87,28 @@ public class ChatActivity extends BaseActivity {
 		mController.nuevo(mPhone, content);
 		mMessages.add(new Message("Yo", content));
 		mAdapter.notifyDataSetChanged();
+		mList.setSelection(mList.getAdapter().getCount()-1);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.chat, menu);
+		return true;
+	}
+	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+		final Message item = mMessages.get(info.position);
+		menu.add(Menu.NONE, item.id, item.id, "Borrar");
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		final int menuItemIndex = item.getItemId();
+		Log.i(Settings.TAG, ""+menuItemIndex);
+		mController.eliminar(menuItemIndex);
+		
 		return true;
 	}
 

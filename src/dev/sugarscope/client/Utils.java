@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.ByteBuffer;
 
 public class Utils {
 	
@@ -19,7 +18,6 @@ public class Utils {
 	public static Object deserialize(byte[] larrData) throws IOException, ClassNotFoundException {
 	    ByteArrayInputStream lclsIn = new ByteArrayInputStream(larrData);
 	    ObjectInputStream lclsIs = new ObjectInputStream(lclsIn);
-	    ByteBuffer asda;
 	    return lclsIs.readObject();
 	}
 	

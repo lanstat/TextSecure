@@ -3,8 +3,8 @@
     <item
         android:id="@+id/send_message"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="Enviar mensaje"/>
+        android:showAsAction="ifRoom|withText"
+        android:title="Enviar mensaje" android:icon="@drawable/send"/>
     <item
         android:id="@+id/contacts"
         android:orderInCategory="100"
