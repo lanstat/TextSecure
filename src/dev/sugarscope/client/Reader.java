@@ -5,52 +5,54 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.os.Handler;
-import dev.sugarscope.generic.Utils;
+import android.util.Log;
+import dev.sugarscope.textsecureclient.settings.Settings;
 import dev.sugarscope.transport.Packet;
 
 public class Reader implements Runnable {
-	private byte[] marrBuffer;
-	private BufferedInputStream mclsInput;
+	private byte[] mBuffer;
+	private BufferedInputStream mInput;
 	public final int BUFFER_SIZE = 1024;
-	private boolean mblnIsAlive = true;
+	private boolean mIsAlive = true;
 	private Handler mHandler;
 	
 	public Reader(InputStream lclsInput) throws IOException{
-		marrBuffer = new byte[0];
-		mclsInput = new BufferedInputStream(lclsInput);
+		mBuffer = new byte[0];
+		mInput = new BufferedInputStream(lclsInput);
 	}
 	
 	public void setHandler(Handler handler){
 		mHandler = handler;
 	}
 	
-	public void setRunning(boolean lblnRunning){
-		mblnIsAlive = lblnRunning;
+	public void setRunning(boolean running){
+		mIsAlive = running;
 		try {
-			mclsInput.close();
+			mInput.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.e(Settings.TAG, e.getMessage());
 		}
 	}
 	
 	@Override
 	public void run() {
-		while (mblnIsAlive) {
+		while (mIsAlive) {
 			try {
-				byte[] larrBuffer = new byte[BUFFER_SIZE];
-				mclsInput.read(larrBuffer);
-				if(mclsInput.available()==0){
-					marrBuffer = Utils.concat(marrBuffer, larrBuffer);
-					final Packet lclsPacket = (Packet)Utils.deserialize(marrBuffer);
+				byte[] buffer = new byte[BUFFER_SIZE];
+				mInput.read(buffer);
+				if(mInput.available()==0){
+					mBuffer = Utils.concat(mBuffer, buffer);
+					final Packet packet = (Packet)Utils.deserialize(mBuffer);
 					if(mHandler!=null){
-						mHandler.sendMessage(mHandler.obtainMessage(0, lclsPacket));
+						Log.i(Settings.TAG, packet.toString());
+						mHandler.sendMessage(mHandler.obtainMessage(0, packet));
 					}
-					marrBuffer = new byte[0];
+					mBuffer = new byte[0];
 				}else{
-					marrBuffer = Utils.concat(marrBuffer, larrBuffer);
+					mBuffer = Utils.concat(mBuffer, buffer);
 				}
 			} catch (Exception e) {
-				mblnIsAlive = false;
+				mIsAlive = false;
 			} 
 		}
 	}

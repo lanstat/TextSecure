@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Observable;
 
-import dev.sugarscope.generic.Utils;
 import dev.sugarscope.transport.Packet;
 
 public class Sender extends Observable implements Runnable{

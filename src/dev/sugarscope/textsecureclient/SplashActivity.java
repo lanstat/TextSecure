@@ -1,15 +1,15 @@
 package dev.sugarscope.textsecureclient;
 
+import dev.sugarscope.textsecureclient.messages.InboxActivity;
+import dev.sugarscope.textsecureclient.persistance.DatabaseHandler;
 import dev.sugarscope.textsecureclient.settings.Settings;
-import persistance.DatabaseHandler;
+import dev.sugarscope.textsecureclient.users.SeedActivity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.view.Menu;
 
 @TargetApi(Build.VERSION_CODES.GINGERBREAD)
 public class SplashActivity extends Activity {
