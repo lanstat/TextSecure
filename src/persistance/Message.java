@@ -7,6 +7,7 @@ public class Message {
 	public static final String CONTENT = "content";
 	public static final String PHONE = "phone";
 	public static final String NAME = "message";
+	public static final String ID = "id";
 	
 	private static final String OnCreate = "CREATE TABLE "+NAME+"(id INTEGER PRIMARY KEY AUTOINCREMENT,"+PHONE+" text, "+CONTENT+" text);";
 	

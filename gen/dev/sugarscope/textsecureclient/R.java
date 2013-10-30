@@ -24,40 +24,52 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f09000a;
-        public static final int btnSend=0x7f090006;
-        public static final int btnSubmit=0x7f090004;
-        public static final int edtPassword=0x7f090003;
-        public static final int edtPhone=0x7f090009;
-        public static final int edtSeed=0x7f090005;
-        public static final int edtUsername=0x7f090002;
-        public static final int linearLayout1=0x7f090001;
-        public static final int listView1=0x7f090000;
-        public static final int send_message=0x7f09000b;
-        public static final int textView1=0x7f090007;
-        public static final int textView2=0x7f090008;
+        public static final int action_settings=0x7f09000d;
+        public static final int add_contact=0x7f09000e;
+        public static final int btnSend=0x7f090005;
+        public static final int btnSubmit=0x7f090009;
+        public static final int button1=0x7f090002;
+        public static final int closeSession=0x7f090011;
+        public static final int contacts=0x7f090010;
+        public static final int edtContent=0x7f090004;
+        public static final int edtName=0x7f090000;
+        public static final int edtPassword=0x7f090008;
+        public static final int edtPhone=0x7f090001;
+        public static final int edtSeed=0x7f09000a;
+        public static final int edtUsername=0x7f090007;
+        public static final int linearLayout1=0x7f090006;
+        public static final int listView1=0x7f090003;
+        public static final int send_message=0x7f09000f;
+        public static final int textView1=0x7f09000b;
+        public static final int textView2=0x7f09000c;
     }
     public static final class layout {
-        public static final int activity_chat=0x7f030000;
-        public static final int activity_inbox=0x7f030001;
-        public static final int activity_login=0x7f030002;
-        public static final int activity_seed=0x7f030003;
-        public static final int activity_sign_up=0x7f030004;
-        public static final int activity_splash=0x7f030005;
+        public static final int activity_add_contact=0x7f030000;
+        public static final int activity_chat=0x7f030001;
+        public static final int activity_contacts=0x7f030002;
+        public static final int activity_inbox=0x7f030003;
+        public static final int activity_login=0x7f030004;
+        public static final int activity_seed=0x7f030005;
+        public static final int activity_sign_up=0x7f030006;
+        public static final int activity_splash=0x7f030007;
     }
     public static final class menu {
-        public static final int chat=0x7f080000;
-        public static final int inbox=0x7f080001;
-        public static final int login=0x7f080002;
-        public static final int seed=0x7f080003;
-        public static final int sign_up=0x7f080004;
-        public static final int splash=0x7f080005;
+        public static final int add_contact=0x7f080000;
+        public static final int chat=0x7f080001;
+        public static final int contacts=0x7f080002;
+        public static final int inbox=0x7f080003;
+        public static final int login=0x7f080004;
+        public static final int seed=0x7f080005;
+        public static final int sign_up=0x7f080006;
+        public static final int splash=0x7f080007;
     }
     public static final class string {
         public static final int action_settings=0x7f060001;
         public static final int app_name=0x7f060000;
         public static final int hello_world=0x7f060002;
+        public static final int title_activity_add_contact=0x7f060009;
         public static final int title_activity_chat=0x7f060007;
+        public static final int title_activity_contacts=0x7f060008;
         public static final int title_activity_inbox=0x7f060004;
         public static final int title_activity_login=0x7f060005;
         public static final int title_activity_sign_up=0x7f060003;

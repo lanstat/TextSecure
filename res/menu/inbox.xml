@@ -5,5 +5,15 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="Enviar mensaje"/>
+    <item
+        android:id="@+id/contacts"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="Contactos"/>
+    <item
+        android:id="@+id/closeSession"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="Cerrar sesion"/>
 
 </menu>

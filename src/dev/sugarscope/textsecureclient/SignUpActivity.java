@@ -49,9 +49,8 @@ public class SignUpActivity extends BaseActivity {
 	}
 	
 	private void save(){
-		DatabaseHandler handler = new DatabaseHandler(this);
+		final DatabaseHandler handler = DatabaseHandler.getInstance();
 		handler.putSetting("phone", mNumber);
-		handler.close();
 	}
 	
 	private String getImei(){

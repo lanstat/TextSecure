@@ -10,10 +10,21 @@ import android.database.sqlite.SQLiteDatabase;
 public class DatabaseHandler {
 	private Database database;
 	private SQLiteDatabase db;
+	private static DatabaseHandler instance;
 	
-	public DatabaseHandler(Context context){
+	private DatabaseHandler(){
+		
+	}
+	
+	public void init(Context context){
 		database = new Database(context);
 		db = database.getWritableDatabase();
+	}
+	
+	public static DatabaseHandler getInstance(){
+		if(instance == null)
+			instance = new DatabaseHandler();
+		return instance;
 	}
 	
 	public void putSetting(String key, String value){
@@ -39,32 +50,36 @@ public class DatabaseHandler {
 	
 	public ArrayList<MessageItem> getLastestConversation(String contact){
 		ArrayList<MessageItem> items = new ArrayList<MessageItem>();
-		Cursor cursor = db.query(Message.NAME, new String[]{Message.PHONE, Message.CONTENT}, "phone ='"+contact+"'", null, "", "", "id");
+		Cursor cursor = db.query(Message.NAME, new String[]{Message.PHONE, Message.CONTENT, Message.ID}, "phone ='"+contact+"'", null, "", "", "id");
 		if(cursor.moveToFirst()){
 			do{
-				items.add(cursor2Message(cursor));
+				items.add(cursor2Message(cursor, true));
 			}while(cursor.moveToNext());
 		}
+		cursor.close();
 		
 		return items;
 	}
 	
 	public ArrayList<MessageItem> getConversations(){
 		ArrayList<MessageItem> items = new ArrayList<MessageItem>();
-		Cursor cursor = db.rawQuery("SELECT distinct phone, content FROM "+Message.NAME+";", null);
+		Cursor cursor = db.rawQuery("SELECT phone, content FROM "+Message.NAME+" GROUP BY phone;", null);
 		if(cursor.moveToFirst()){
 			do{
-				items.add(cursor2Message(cursor));
+				items.add(cursor2Message(cursor, false));
 			}while(cursor.moveToNext());
 		}
+		cursor.close();
 		
 		return items;
 	} 
 	
-	private MessageItem cursor2Message(Cursor cursor){
+	private MessageItem cursor2Message(Cursor cursor, boolean id){
 		MessageItem item = new MessageItem();
 		item.phone = cursor.getString(0);
 		item.content = cursor.getString(1);
+		if(id)
+			item.id = cursor.getInt(2);
 		
 		return item;
 	}

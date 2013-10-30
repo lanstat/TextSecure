@@ -79,8 +79,14 @@ public class Client implements Observer{
 	 * @throws IOException 
 	 */
 	public void close() throws IOException{
-		mclsReader.setRunning(false);
-		mclsSocket.close();
+		if(mclsSocket != null && mclsSocket.isConnected()){
+			mclsReader.setRunning(false);
+			mclsSocket.close();
+		}
+		mclsReader = null;
+		marrStackPakects = null;
+		mclsSocket = null;
+		mclsClient = null;
 	}
 	
 	public Reader getReader(){

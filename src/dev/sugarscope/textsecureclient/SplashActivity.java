@@ -20,7 +20,8 @@ public class SplashActivity extends Activity {
 		setContentView(R.layout.activity_splash);
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
-		DatabaseHandler handler = new DatabaseHandler(this);
+		final DatabaseHandler handler = DatabaseHandler.getInstance();
+		handler.init(this);
 		String phone = handler.getSetting("phone");
 		if(phone==null){
 			Intent intent = new Intent(this, SeedActivity.class);

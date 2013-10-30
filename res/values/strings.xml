@@ -9,5 +9,7 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_contacts">ContactsActivity</string>
+    <string name="title_activity_add_contact">AddContactActivity</string>
 
 </resources>

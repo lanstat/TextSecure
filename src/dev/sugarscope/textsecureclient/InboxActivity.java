@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import persistance.DatabaseHandler;
 import dev.sugarscope.client.Client;
+import dev.sugarscope.textsecureclient.contacts.ContactsActivity;
+import dev.sugarscope.textsecureclient.controls.ControlMensaje;
 import dev.sugarscope.textsecureclient.settings.MessageItem;
 import dev.sugarscope.textsecureclient.settings.Settings;
 import dev.sugarscope.textsecureclient.settings.Tag;
@@ -17,7 +19,9 @@ import android.os.Message;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -29,12 +33,15 @@ import android.widget.ListView;
 public class InboxActivity extends BaseActivity implements OnItemClickListener{
 	ListView mList;
 	ArrayList<MessageItem> mContacts;
+	ControlMensaje mController;
+	ArrayAdapter<MessageItem> mAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_inbox);
 		mList = (ListView)findViewById(R.id.listView1);
+		mController = new ControlMensaje();
 		mHandler = new Handler(){
 
 			@Override
@@ -44,14 +51,28 @@ public class InboxActivity extends BaseActivity implements OnItemClickListener{
 				case Tag.OBTAIN_SAVED_MESSAGE:
 					convertPacketToMessages(packet.getData());
 					break;
+				case Tag.SEND_MESSAGE:
+					addMessage(packet.getData());
+					break;
 				}
 			}
 			
 		};
 	}
 	
+	private void addMessage(Object[] data){
+		final String phone= data[0].toString();
+		final String content = data[1].toString();
+		final MessageItem item = new MessageItem(phone, content);
+		mController.guardar(item);
+		final DatabaseHandler handler = DatabaseHandler.getInstance();
+		mContacts = handler.getConversations();
+		mAdapter.notifyDataSetChanged();
+		showMessage("Nuevo mensaje recibido");
+	}
+	
 	private void convertPacketToMessages(Object[] data){
-		DatabaseHandler handler = new DatabaseHandler(this);
+		final DatabaseHandler handler = DatabaseHandler.getInstance();
 		ArrayList<String> phones = new ArrayList<String>();
 		for(Object obj : data){
 			String[] message = (String[])obj;
@@ -62,37 +83,53 @@ public class InboxActivity extends BaseActivity implements OnItemClickListener{
 				mContacts.add(0, item);
 			}
 		}
-		handler.close();
-		ArrayAdapter<MessageItem> adapter = new ArrayAdapter<MessageItem>(this, android.R.layout.simple_list_item_1, mContacts);
-		mList.setAdapter(adapter);
-		mList.setOnItemClickListener(this);
+		mAdapter.notifyDataSetChanged();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		final DatabaseHandler handler = DatabaseHandler.getInstance();
+		mContacts = handler.getConversations();
+		mAdapter = new ArrayAdapter<MessageItem>(this, android.R.layout.simple_list_item_1, mContacts);
+		mList.setAdapter(mAdapter);
+		mList.setOnItemClickListener(this);
 		try {
 			Client.getInstance().connect(Settings.SERVER_HOST, Settings.SERVER_PORT);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			Client.getInstance().getReader().setHandler(mHandler);
+			
+			Packet packet = new Packet(Tag.LOGIN);
+			packet.setData(Settings.phone);
+			Client.getInstance().sendPackage(packet);
+		} catch (Exception e) {
+			showMessage("No se logro realizar un conexion con el servidor.");
 		}
-		Client.getInstance().getReader().setHandler(mHandler);
-		
-		DatabaseHandler handler = new DatabaseHandler(this);
-		mContacts = handler.getConversations();
-		handler.close();
-		
-		Packet packet = new Packet(Tag.LOGIN);
-		packet.setData(Settings.phone);
-		Client.getInstance().sendPackage(packet);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.inbox, menu);
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.contacts:
+			Intent intent = new Intent(this, ContactsActivity.class);
+			startActivity(intent);
+			break;
+		case R.id.closeSession:
+			try {
+				DatabaseHandler.getInstance().close();
+				Client.getInstance().close();
+			} catch (Exception e) {
+				Log.e("tag", e.getMessage());
+			}
+			finish();
+			break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
